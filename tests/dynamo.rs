@@ -1,5 +1,3 @@
-//! Dynamo(非通用版)集成测试。
-
 use ark_ec::PrimeGroup;
 use ark_std::rand::Rng;
 use ark_std::UniformRand;
@@ -25,7 +23,7 @@ fn prove_verify_roundtrip() {
         let h = derive_h(&z, &sigma);
 
         let (x, pi) = prove(&pk, &z, &h, &mut rng);
-        assert!(verify(&vk, &x, &pi), "roundtrip 失败:m = {m}");
+        assert!(verify(&vk, &x, &pi), "roundtrip fail: m = {m}");
     }
 }
 
@@ -43,7 +41,7 @@ fn tampered_proof_is_rejected() {
 
     let mut bad = pi;
     bad.alpha = bad.alpha + G1::generator();
-    assert!(!verify(&vk, &x, &bad), "篡改 alpha 必须被拒绝");
+    assert!(!verify(&vk, &x, &bad), "tampered proof is not rejected");
 }
 
 #[test]
@@ -53,10 +51,9 @@ fn witness_violating_relation_is_rejected() {
     let sigma = random_permutation(m, &mut rng);
     let (pk, vk) = setup(m, &sigma, &mut rng);
 
-    // 不满足 h_i = z_i - z_{σ(i)} 的随机见证应无法通过验证
     let z: Vec<Scalar> = (0..m).map(|_| Scalar::rand(&mut rng)).collect();
     let h: Vec<Scalar> = (0..m).map(|_| Scalar::rand(&mut rng)).collect();
 
     let (x, pi) = prove(&pk, &z, &h, &mut rng);
-    assert!(!verify(&vk, &x, &pi), "违反关系的见证必须被拒绝");
+    assert!(!verify(&vk, &x, &pi), "witness violating relation is not rejected");
 }

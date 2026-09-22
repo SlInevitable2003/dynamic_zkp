@@ -1,14 +1,12 @@
-//! Dynamo(非通用版)Prove(README §1.1.2)。
-
 use crate::common::curve::{G1, Scalar};
 use crate::common::msm::msm;
 use crate::protocols::dynamo::non_universal::types::{Instance, Proof, ProvingKey};
+
 use ark_ec::PrimeGroup;
 use ark_ff::Field;
 use ark_std::rand::Rng;
 use ark_std::UniformRand;
 
-/// 用见证 `z`、`h` 生成实例 `x` 与证明 `π`。
 pub fn prove<R: Rng>(
     pk: &ProvingKey,
     z: &[Scalar],
@@ -16,10 +14,9 @@ pub fn prove<R: Rng>(
     rng: &mut R,
 ) -> (Instance, Proof) {
     let m = z.len();
-    assert_eq!(h.len(), m, "z 与 h 长度必须一致");
-    assert_eq!(pk.alpha.len(), m, "pk 是为不同的 m 生成的");
+    assert_eq!(h.len(), m, "the length of z must match that of h");
+    assert_eq!(pk.alpha.len(), m, "pk is generated for different m");
 
-    // 盲化随机数
     let rho_z = Scalar::rand(rng);
     let rho_h = Scalar::rand(rng);
     let rho_qv = Scalar::rand(rng);
@@ -27,7 +24,6 @@ pub fn prove<R: Rng>(
 
     let inv_m = Scalar::from(m as u64).inverse().expect("m is nonzero");
 
-    // 线性组合(注意 [H] 用 z,[h] 才用 h)
     let alpha = msm(&pk.alpha, z); // [α]_1
     let beta = msm(&pk.beta, z); // [β]_1
     let zcomb = msm(&pk.z, z); // [Z]_1

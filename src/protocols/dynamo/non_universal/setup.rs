@@ -1,14 +1,12 @@
-//! Dynamo(非通用版)Setup(README §1.1.1)。
-
 use crate::common::curve::{G1, G2, Scalar};
 use crate::common::poly::{inverse_permutation, lagrange_evals, u_eval, y_evals};
 use crate::protocols::dynamo::non_universal::types::{ProvingKey, VerifyingKey};
+
 use ark_ec::PrimeGroup;
 use ark_ff::Field;
 use ark_std::rand::Rng;
 use ark_std::UniformRand;
 
-/// 生成 `(pk, vk)`。`sigma` 是 `(0..m)` 上的置换,`m` 为 2 的幂。
 pub fn setup<R: Rng>(m: usize, sigma: &[usize], rng: &mut R) -> (ProvingKey, VerifyingKey) {
     assert!(m.is_power_of_two(), "m must be a power of 2");
     assert_eq!(sigma.len(), m, "sigma must have length m");
@@ -25,9 +23,7 @@ pub fn setup<R: Rng>(m: usize, sigma: &[usize], rng: &mut R) -> (ProvingKey, Ver
     let tau_x_m = tau_x.pow([m as u64]); // τ_X^m
     let tau_y_m = tau_y.pow([m as u64]); // τ_Y^m
     let inv_m = Scalar::from(m as u64).inverse().expect("m is nonzero");
-    let inv_denom = (tau_x_m - Scalar::ONE)
-        .inverse()
-        .expect("τ_X^m != 1 (否则除以零)");
+    let inv_denom = (tau_x_m - Scalar::ONE).inverse().expect("τ_X^m != 1");
     let inv_tau_x = tau_x.inverse().expect("τ_X nonzero");
 
     let g1 = G1::generator();

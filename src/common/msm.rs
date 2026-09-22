@@ -1,11 +1,10 @@
-//! 多标量乘法(MSM)助手。
+use ark_ec::{ScalarMul, VariableBaseMSM};
 
 use crate::common::curve::{G1, Scalar};
 
-/// 朴素 MSM:计算 `Σ_i scalars[i] · bases[i]`。
-///
-/// 学习用清晰实现;后续需要性能时换成 [`ark_ec::msm::VariableBaseMSM`]。
+/// 批量归一化 bases 后做高效 MSM(Pippenger/wNAF)。
 pub fn msm(bases: &[G1], scalars: &[Scalar]) -> G1 {
-    assert_eq!(bases.len(), scalars.len(), "bases 与 scalars 长度必须一致");
-    bases.iter().zip(scalars).map(|(b, s)| *b * *s).sum()
+    assert_eq!(bases.len(), scalars.len(), "bases and scalars must have the same length");
+    let affine = G1::batch_convert_to_mul_base(bases);
+    G1::msm_unchecked(&affine, scalars)
 }

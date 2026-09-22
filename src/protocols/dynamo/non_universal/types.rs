@@ -2,7 +2,6 @@
 
 use crate::common::curve::{G1, G2};
 
-/// 证明密钥(README §1.1.1 的 `pk`)。
 #[derive(Clone, Debug)]
 pub struct ProvingKey {
     pub alpha: Vec<G1>, // pk.α[i]
@@ -23,7 +22,6 @@ pub struct ProvingKey {
 }
 
 impl ProvingKey {
-    /// 预分配容量并置标量为单位元,由 `setup` 填充。
     pub(crate) fn with_capacity(m: usize) -> Self {
         Self {
             alpha: Vec::with_capacity(m),
@@ -44,7 +42,6 @@ impl ProvingKey {
     }
 }
 
-/// 验证密钥(README §1.1.1 的 `vk`)。
 #[derive(Clone, Debug)]
 pub struct VerifyingKey {
     pub u: G2,    // [u(τ_X, τ_Y)]_2
@@ -55,14 +52,12 @@ pub struct VerifyingKey {
     pub invm: G2, // [m^{-1}]_2
 }
 
-/// 公开实例 `x = ([z_zk]_1, [h_zk]_1)`。
 #[derive(Clone, Copy, Debug)]
 pub struct Instance {
     pub z: G1,
     pub h: G1,
 }
 
-/// 证明 `π`。
 #[derive(Clone, Copy, Debug)]
 pub struct Proof {
     pub alpha: G1, // [α_zk]_1

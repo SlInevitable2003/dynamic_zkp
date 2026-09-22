@@ -1,5 +1,3 @@
-//! Dynamo 非通用版(README §1.1)。
-
 mod prove;
 mod relation;
 mod setup;
