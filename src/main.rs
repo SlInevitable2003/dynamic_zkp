@@ -14,7 +14,7 @@ fn random_permutation<R: Rng>(m: usize, rng: &mut R) -> Vec<usize> {
 }
 
 fn main() {
-    let m = 1024;
+    let m = 1 << 20;
     let mut rng = ark_std::test_rng();
 
     let sigma = random_permutation(m, &mut rng);

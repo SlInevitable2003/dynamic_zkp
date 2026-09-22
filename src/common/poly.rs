@@ -12,21 +12,44 @@ pub fn root_of_unity(m: usize) -> Scalar {
 }
 
 pub fn lagrange_evals(tau: Scalar, m: usize) -> Vec<Scalar> {
-    
     let w = root_of_unity(m);
     let w_inv = w.inverse().expect("root of unity is nonzero");
-    let mut w_pow = Scalar::ONE;
-
     let num = tau.pow([m as u64]) - Scalar::ONE;
     let inv_m = Scalar::from(m as u64).inverse().expect("m is nonzero");
-    (0..m)
+
+    let mut w_pow = Scalar::ONE;
+    let denoms: Vec<Scalar> = (0..m)
         .map(|_| {
-            let denom = w_pow * tau - Scalar::ONE;
-            let li = num * denom.inverse().expect("τ != ω^i") * inv_m;
+            let d = w_pow * tau - Scalar::ONE;
             w_pow *= w_inv;
-            li
+            d
         })
-        .collect()
+        .collect();
+    let inv_denoms = batch_inversion(&denoms);
+
+    let factor = num * inv_m;
+    inv_denoms.into_iter().map(|inv_d| factor * inv_d).collect()
+}
+
+fn batch_inversion(v: &[Scalar]) -> Vec<Scalar> {
+    let n = v.len();
+    let mut out = vec![Scalar::ONE; n];
+    if n == 0 { return out; }
+
+    let mut prefix = vec![Scalar::ONE; n];
+    let mut acc = Scalar::ONE;
+    for i in 0..n {
+        acc *= v[i];
+        prefix[i] = acc;
+    }
+
+    let mut inv = acc.inverse().expect("zero has no inverse");
+    for i in (0..n).rev() {
+        let prev = if i == 0 { Scalar::ONE } else { prefix[i - 1] };
+        out[i] = inv * prev;
+        inv *= v[i];
+    }
+    out
 }
 
 pub fn inverse_permutation(sigma: &[usize]) -> Vec<usize> {

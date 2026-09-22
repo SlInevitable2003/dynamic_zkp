@@ -1,5 +1,3 @@
-//! Dynamo(非通用版)的公开参数与证明结构体。
-
 use crate::common::curve::{G1, G2};
 
 #[derive(Clone, Debug)]
@@ -19,27 +17,6 @@ pub struct ProvingKey {
     pub ym: G1,    // [τ_Y^m]_1
     pub xm_ym: G1, // [τ_X^m · τ_Y^m]_1
     pub x2_ym: G1, // [τ_X^2 · τ_Y^m]_1
-}
-
-impl ProvingKey {
-    pub(crate) fn with_capacity(m: usize) -> Self {
-        Self {
-            alpha: Vec::with_capacity(m),
-            beta: Vec::with_capacity(m),
-            z: Vec::with_capacity(m),
-            h: Vec::with_capacity(m),
-            b: Vec::with_capacity(m),
-            lx: Vec::with_capacity(m),
-            ly: Vec::with_capacity(m),
-            u: G1::default(),
-            x: G1::default(),
-            x2: G1::default(),
-            xm: G1::default(),
-            ym: G1::default(),
-            xm_ym: G1::default(),
-            x2_ym: G1::default(),
-        }
-    }
 }
 
 #[derive(Clone, Debug)]

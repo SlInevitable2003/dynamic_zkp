@@ -13,6 +13,8 @@ pub fn prove<R: Rng>(
     h: &[Scalar],
     rng: &mut R,
 ) -> (Instance, Proof) {
+    let prove_start = std::time::Instant::now();
+
     let m = z.len();
     assert_eq!(h.len(), m, "the length of z must match that of h");
     assert_eq!(pk.alpha.len(), m, "pk is generated for different m");
@@ -24,13 +26,13 @@ pub fn prove<R: Rng>(
 
     let inv_m = Scalar::from(m as u64).inverse().expect("m is nonzero");
 
-    let alpha = msm(&pk.alpha, z); // [α]_1
-    let beta = msm(&pk.beta, z); // [β]_1
-    let zcomb = msm(&pk.z, z); // [Z]_1
-    let hcomb = msm(&pk.h, z); // [H]_1
-    let bcomb = msm(&pk.b, z); // [B]_1
-    let z_lin = msm(&pk.lx, z); // [z]_1
-    let h_lin = msm(&pk.ly, h); // [h]_1
+    let alpha = msm_timed("alpha", &pk.alpha, z); // [α]_1
+    let beta = msm_timed("beta", &pk.beta, z); // [β]_1
+    let zcomb = msm_timed("Z", &pk.z, z); // [Z]_1
+    let hcomb = msm_timed("H", &pk.h, z); // [H]_1
+    let bcomb = msm_timed("B", &pk.b, z); // [B]_1
+    let z_lin = msm_timed("z", &pk.lx, z); // [z]_1
+    let h_lin = msm_timed("h", &pk.ly, h); // [h]_1
 
     let g1 = G1::generator();
     let xm1 = pk.xm - g1; // G1 上的 τ_X^m - 1
@@ -55,5 +57,15 @@ pub fn prove<R: Rng>(
         h: h_zk_p,
         b: b_zk,
     };
+
+    eprintln!("[prove] total: {:?} (m = {m})", prove_start.elapsed());
+
     (instance, proof)
+}
+
+fn msm_timed(label: &str, bases: &[G1], scalars: &[Scalar]) -> G1 {
+    let start = std::time::Instant::now();
+    let out = msm(bases, scalars);
+    eprintln!("[prove] msm[{label}]: {:?}", start.elapsed());
+    out
 }

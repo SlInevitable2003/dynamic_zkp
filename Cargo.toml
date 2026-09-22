@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 ark-bls12-381 = "0.5"
-ark-ec = "0.5"
+ark-ec = { version = "0.5", features = ["parallel"] }
 ark-ff = "0.5"
 ark-std = "0.5"
+rayon = "1"
